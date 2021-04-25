@@ -91,7 +91,9 @@ def mars_facts():
     df.set_index('Description', inplace=True)
 
     # Convert dataframe into HTML format, add bootstrap
-    return df.to_html()
+    html_table = df.to_html(classes=["table", "table-bordered", "table-hover", "table-striped "]).replace("<thead>", "<thead.thead-dark>")
+    html_table = html_table.replace("<th></th>\n      <th>Mars</th>\n      <th>Earth</th>\n    </tr>\n    <tr>\n      <th>Description</th>\n      <th></th>\n      <th></th>\n",'<th>Description</th> <th>Mars</th> <th>Earth</th>' )
+    return html_table
 
 def hemispheres(browser):
     base_url ='https://data-class-mars-hemispheres.s3.amazonaws.com/Mars_Hemispheres/'
