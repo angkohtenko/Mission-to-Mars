@@ -19,7 +19,8 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "hemispheres": hemispheres(browser)
     }
 
     # Stop webdriver and return data
@@ -91,6 +92,32 @@ def mars_facts():
 
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html()
+
+def hemispheres(browser):
+    base_url ='https://data-class-mars-hemispheres.s3.amazonaws.com/Mars_Hemispheres/'
+    browser.visit(f'{base_url}index.html')
+
+    hemisphere_image_urls = []
+    html = browser.html
+
+    hemisperes_soup = soup(html, 'html.parser')
+    for link in hemisperes_soup.find_all('div', class_='description'):
+        a_tag = link.find('a', class_='product-item')
+        url = a_tag.get('href')
+        title = a_tag.get_text()
+
+        browser.visit(f'{base_url}{url}')
+        html = browser.html
+        img_soup = soup(html, 'html.parser')
+
+        a_tag = img_soup.find('div', class_='downloads').select('a')[0]
+        img_url = f"{base_url}{a_tag.get('href')}"
+
+        hemispheres = {'img_url': img_url,
+                        'title': title}
+        hemisphere_image_urls.append(hemispheres)
+    return hemisphere_image_urls
+
 
 if __name__ == "__main__":
     # If running as script, print scraped data
